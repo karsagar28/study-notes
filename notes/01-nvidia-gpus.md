@@ -4,6 +4,8 @@
 
 NVIDIA moved from a two-year to an **annual architecture cadence** for data center silicon. The confirmed roadmap: Blackwell (2024) → Blackwell Ultra (2025) → Rubin (H2 2026) → Rubin Ultra (H2 2027) → Feynman (2028).
 
+![NVIDIA data center GPU and CPU lineups](notes/img/fig-nvidia-lineup.svg)
+
 ## Generations
 
 | Generation | Chips | Memory | Process | Status (mid-2026) |

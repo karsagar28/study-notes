@@ -4,6 +4,8 @@
 
 One CPU architecture at a time, sold standalone or fused into superchips. The CPU exists to feed the GPU: huge memory bandwidth, coherent NVLink-C2C to the accelerator, low power.
 
+![NVIDIA data center GPU and CPU lineups](notes/img/fig-nvidia-lineup.svg)
+
 ## The line
 
 | Product | What it is | Notes |

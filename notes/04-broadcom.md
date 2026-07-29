@@ -7,6 +7,8 @@ Two distinct silicon lines, split by one question: **where does the packet buffe
 - **StrataXGS** (Tomahawk, Trident): shallow on-chip shared buffer → speed, radix, low cost per bit.
 - **StrataDNX** (Jericho, Qumran, Ramon): deep HBM buffer + VOQ scheduling → scale, lossless routing.
 
+![Broadcom ASIC families by role](notes/img/fig-broadcom.svg)
+
 ## The families
 
 | Family | Line | Role | Current parts |

@@ -4,6 +4,8 @@
 
 Every ASIC has a fixed die-area and power budget. Every "feature" is a decision about where to spend transistors. Two 51.2T chips with identical datasheet throughput can be completely different products depending on what the silicon was spent on.
 
+![Where die area goes, by use case](notes/img/fig-die-budget.svg)
+
 **The one-sentence version**: throughput is what the datasheet leads with, but the use case is defined by what the chip does when things go wrong — congestion, table exhaustion, protocol weirdness — and each family pre-pays for exactly one flavor of trouble.
 
 ## The axes

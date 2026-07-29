@@ -4,6 +4,10 @@
 
 One unified architecture and SDK spanning switching and routing, from campus access to web-scale AI fabrics. The pitch: same P4-programmable pipeline, same tooling, different die configurations per role. This is the structural opposite of Broadcom's two-silicon-lines approach (StrataXGS vs StrataDNX).
 
+![Cisco Silicon One families by role](notes/img/fig-silicon-one.svg)
+
+> Cisco's other DC silicon, CloudScale (Nexus 9000 / ACI), is covered in **C-07** — different generation of thinking, now converging toward Silicon One.
+
 ## Families by role
 
 | Family | Role | Key parts | Notes |
