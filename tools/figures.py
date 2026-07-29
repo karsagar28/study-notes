@@ -215,6 +215,47 @@ def fig_scheduled_fabric():
     return svg(680, 470, "Unscheduled Clos vs scheduled fabric", b)
 
 
+def fig_pfc_ecn_thresholds():
+    b = f'<text class="ts" x="60" y="62">egress queue depth →</text>'
+    segs = [(60, 140, "gray", "healthy"), (200, 140, "teal", "ECN ramp 0→Pmax"),
+            (340, 120, "coral", "100% mark"), (460, 160, "purple", "PFC headroom")]
+    for x, w, color, label in segs:
+        b += box(x, 80, w, 56, color, label, title_cls="ts")
+    for x, label in [(200, "Kmin"), (340, "Kmax"), (460, "XOFF · pause sent")]:
+        b += (f'<line x1="{x}" y1="74" x2="{x}" y2="152" stroke="{INK}" stroke-width="1.2"/>'
+              f'<text class="ts" x="{x}" y="170" text-anchor="middle">{label}</text>')
+    b += (f'<line x1="400" y1="74" x2="400" y2="152" stroke="{MUTED}" stroke-width="1" stroke-dasharray="3 3"/>'
+          f'<text class="ts" x="400" y="192" text-anchor="middle">XON · resume</text>')
+    b += f'<text class="ts" x="60" y="226">Tuning rule: Kmax sits comfortably below XOFF — ECN throttles senders before PFC ever fires.</text>'
+    return svg(680, 244, "ECN and PFC thresholds on one egress queue", b)
+
+
+def fig_dcqcn_loop():
+    b = box(40, 60, 150, 56, "teal", "Sender NIC", "DCQCN rate limiter")
+    b += arrow(192, 88, 268, 88)
+    b += f'<text class="ts" x="230" y="76" text-anchor="middle">data</text>'
+    b += box(270, 60, 160, 56, "coral", "Switch queue", "marks CE > Kmin")
+    b += arrow(432, 88, 498, 88)
+    b += box(500, 60, 140, 56, "teal", "Receiver NIC", "sees CE → CNP")
+    b += (f'<path d="M570 118 C 570 188 115 188 115 118" fill="none" stroke="{MUTED}" '
+          f'stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#a)"/>'
+          f'<text class="ts" x="342" y="204" text-anchor="middle">CNP — per-flow congestion notification → sender slows that flow only</text>')
+    return svg(680, 224, "The DCQCN control loop", b)
+
+
+def fig_pfc_deadlock():
+    b = box(280, 40, 120, 48, "coral", "Switch A", title_cls="ts")
+    b += box(460, 190, 120, 48, "coral", "Switch B", title_cls="ts")
+    b += box(60, 190, 120, 48, "coral", "Switch C", title_cls="ts")
+    b += arrow(402, 80, 502, 188) + arrow(458, 214, 182, 214) + arrow(138, 188, 282, 82)
+    for x, y in [(468, 128), (320, 204), (188, 128)]:
+        b += f'<text class="ts" x="{x}" y="{y}" text-anchor="middle">XOFF</text>'
+    b += f'<text class="th" x="330" y="150" text-anchor="middle">deadlock</text>'
+    b += (f'<text class="ts" x="40" y="268">Cyclic buffer dependency: each switch has paused the next — every buffer full, no one can drain, PFC has no timeout.</text>'
+          f'<text class="ts" x="40" y="288">PFC watchdog: queue paused beyond threshold → stop honoring pause / drop on that queue, breaking the cycle.</text>')
+    return svg(680, 304, "PFC pause-dependency deadlock and the watchdog", b)
+
+
 FIGS = {
     "fig-nvidia-lineup.svg": fig_nvidia,
     "fig-silicon-one.svg": fig_silicon_one,
@@ -224,6 +265,9 @@ FIGS = {
     "fig-afd-dpp.svg": fig_afd_dpp,
     "fig-pipeline-vs-rtc.svg": fig_pipeline_rtc,
     "fig-scheduled-fabric.svg": fig_scheduled_fabric,
+    "fig-pfc-ecn-thresholds.svg": fig_pfc_ecn_thresholds,
+    "fig-dcqcn-loop.svg": fig_dcqcn_loop,
+    "fig-pfc-deadlock.svg": fig_pfc_deadlock,
 }
 
 if __name__ == "__main__":

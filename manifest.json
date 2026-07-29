@@ -46,6 +46,11 @@
       "id": "09-vocabulary",
       "part": "X-09",
       "title": "Vocabulary: P4, pipelines, RTC"
+    },
+    {
+      "id": "10-pfc-ecn",
+      "part": "X-10",
+      "title": "Lossless Ethernet: PFC, ECN, watchdog"
     }
   ]
 }

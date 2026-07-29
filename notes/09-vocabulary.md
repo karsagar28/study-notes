@@ -32,7 +32,7 @@ Silicon One = P4-programmable RTC engines → the program stretches, not the sil
 | DDC | Distributed disaggregated chassis — Jericho line cards + Ramon fabric elements behaving as one huge scheduled router. |
 | OCB | On-chip buffer — the SRAM tier in front of HBM in deep-buffer designs. |
 | ETRAP / AFD / DPP | CloudScale elephant-flow detection, fair early dropping, and new-flow prioritization. See C-07. |
-| ECN / PFC / DCQCN | Congestion signaling stack for RoCE: mark instead of drop, pause per priority, rate-control end hosts. |
+| ECN / PFC / DCQCN | Congestion signaling stack for RoCE: mark instead of drop, pause per priority, rate-control end hosts.See X-10. |
 | Incast | Many senders → one receiver simultaneously; the traffic pattern that defines buffer requirements. |
 | SUE | Broadcom Scale-Up Ethernet — Ethernet as an NVLink alternative inside the rack. |
 | HyperPort | Jericho4's bonded 3.2 Tbps logical port for scale-across links. |
