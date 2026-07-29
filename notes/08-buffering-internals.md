@@ -23,6 +23,20 @@ A: **physically shared, logically per-queue.** Nobody does static per-port carvi
 
 Tomahawk/Trident use a shared MMU buffer with dynamic thresholds across all ports. Tomahawk 5 moved to a fully unified shared buffer after earlier generations partitioned it into per-pipe slices (→ stranded capacity). So shallow-vs-deep is **not** shared-vs-dedicated; it's *how much* shared memory, and whether there's an HBM overflow tier with a VOQ scheduler in front.
 
+## Scheduled fabric vs standalone VOQ
+
+Q: both use credits/grants from egress — so what's different?
+
+A: **same loop, different distance.** The credit mechanism is identical; what changes is the scope of the scheduling domain, plus one genuinely new behavior: cells.
+
+![Unscheduled Ethernet Clos vs scheduled fabric with cell spraying and credit grants](notes/img/fig-scheduled-fabric.svg)
+
+- **Scope.** Single-device VOQ: ingress and egress are two ends of one die (or line cards over a chassis backplane); the credit round-trip is nanoseconds over copper. Scheduled fabric (DDC): the same discipline runs over optics between separate boxes — Jericho devices as "line cards," Ramon as the "backplane." A DDC literally is a modular router with the sheet metal removed. The crediting is inherited, not reinvented.
+- **Cells, not packets.** The real new behavior. Normal Clos: packets traverse whole, ECMP pins each flow to one spine path → elephant collisions while other links idle. Scheduled fabric: ingress chops packets into fixed cells and sprays them across *all* fabric links; egress reassembles and reorders. Near-perfect load balancing by construction — no path selection to get wrong. Cost: cell overhead on fabric links, reassembly state at egress.
+- **Where contention resolves.** Unscheduled: discovered en route — spine queue fills, ECN/PFC propagate back, DCQCN throttles. Reactive; where PFC storms and deadlocks live. Scheduled: resolved *before* transmission — egress grants credits at drain rate, so cells enter the fabric already guaranteed a landing slot. Fabric core is contention-free by construction; congestion manifests as VOQ depth at ingress (where the HBM is), not queue buildup mid-fabric.
+- **Terminology check.** A plain shared-buffer switch (Tomahawk/Trident) is *output-queued* and uses **no credits at all** — packets buffer at the egress MMU. Credits are a VOQ thing. The spectrum: output-queued shared buffer (no credits) → single-device VOQ (credits across one chip/chassis) → scheduled fabric (credits + cell spray across the network).
+- **The trade-off keeping both alive.** Scheduled fabric is a closed system: same proprietary cell/credit protocol end to end → single-vendor by construction (all DNX, or all Silicon One in scheduled mode), scale bounded by fabric reachability state. Open Ethernet Clos mixes vendors but must approximate the outcome reactively (adaptive/cognitive routing, NIC packet spraying, DCQCN tuning). UEC's goal is exactly this gap: spray-and-reorder semantics on interoperable Ethernet.
+
 ## Caveat
 
 Exact eviction policies and threshold mechanics are datasheet/NDA territory per vendor. The above is the industry-standard shape (Jericho, Silicon One P-series both follow it), not a register-level description of any one part.

@@ -186,6 +186,35 @@ def fig_pipeline_rtc():
     return svg(680, 310, "Pipeline vs run-to-completion execution", b)
 
 
+def fig_scheduled_fabric():
+    def panel(oy, tone, title, ing, ing_sub, spine_lbl, eg, eg_sub, spray):
+        b = f'<text class="th" x="40" y="{oy}">{title}</text>'
+        b += box(40, oy + 52, 140, 56, tone, ing, ing_sub)
+        for i in range(3):
+            b += box(300, oy + 20 + i * 48, 90, 32, tone, f"{spine_lbl} {i+1}", title_cls="ts")
+        b += box(500, oy + 52, 140, 56, tone, eg, eg_sub)
+        ys = [oy + 36, oy + 84, oy + 132]  # spine centers
+        if spray:  # all paths active
+            for i, sy in enumerate(ys):
+                b += arrow(180, oy + 72 + i * 8, 296, sy)
+                b += arrow(390, sy, 496, oy + 72 + i * 8)
+        else:  # one ECMP path bold, others faint
+            for sy in (ys[0], ys[2]):
+                b += (f'<line x1="180" y1="{oy+80}" x2="296" y2="{sy}" stroke="{MUTED}" stroke-width="1" opacity="0.3"/>'
+                      f'<line x1="390" y1="{sy}" x2="496" y2="{oy+80}" stroke="{MUTED}" stroke-width="1" opacity="0.3"/>')
+            b += arrow(180, oy + 80, 296, ys[1]) + arrow(390, ys[1], 496, oy + 80)
+        return b
+    b = panel(36, "gray", "A · Unscheduled Ethernet Clos — packets",
+              "Ingress leaf", "ECMP hash", "Spine", "Egress leaf", "MMU queue", spray=False)
+    b += f'<text class="ts" x="40" y="205">whole packets · one path per flow · congestion discovered en route · PFC/ECN reacts</text>'
+    b += panel(266, "teal", "B · Scheduled fabric (DDC) — cells + credits",
+               "Ingress VOQ", "cells sprayed", "Fabric el.", "Egress", "cells → packets", spray=True)
+    b += (f'<path d="M570 376 C 570 442 110 442 110 376" fill="none" stroke="{MUTED}" '
+          f'stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#a)"/>'
+          f'<text class="ts" x="340" y="458" text-anchor="middle">credit grants flow back — ingress sends only at egress drain rate</text>')
+    return svg(680, 470, "Unscheduled Clos vs scheduled fabric", b)
+
+
 FIGS = {
     "fig-nvidia-lineup.svg": fig_nvidia,
     "fig-silicon-one.svg": fig_silicon_one,
@@ -194,6 +223,7 @@ FIGS = {
     "fig-voq-two-tier.svg": fig_voq,
     "fig-afd-dpp.svg": fig_afd_dpp,
     "fig-pipeline-vs-rtc.svg": fig_pipeline_rtc,
+    "fig-scheduled-fabric.svg": fig_scheduled_fabric,
 }
 
 if __name__ == "__main__":
