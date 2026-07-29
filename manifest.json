@@ -1,0 +1,12 @@
+{
+  "title": "AI silicon field notes",
+  "subtitle": "GPUs, CPUs, and network ASICs — a working reference",
+  "chapters": [
+    { "id": "01-nvidia-gpus", "part": "N-01", "title": "NVIDIA data center GPUs" },
+    { "id": "02-nvidia-cpus", "part": "N-02", "title": "NVIDIA CPUs (Grace line)" },
+    { "id": "03-cisco-silicon-one", "part": "C-03", "title": "Cisco Silicon One" },
+    { "id": "04-broadcom", "part": "B-04", "title": "Broadcom Tomahawk, Trident, Jericho" },
+    { "id": "05-design-tradeoffs", "part": "X-05", "title": "What each chip optimizes for" },
+    { "id": "06-network-roles", "part": "X-06", "title": "Scale-up, scale-out, scale-across" }
+  ]
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI silicon field notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAFAF7; --ink:#1A1D21; --muted:#5C6470; --line:#E3E4DE;
+  --trace:#0E6E5C; --trace-soft:#E4F0EC; --card:#FFFFFF; --code-bg:#F1F2ED;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --disp:"Space Grotesk",var(--sans);
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#15181B; --ink:#E6E8E4; --muted:#98A0A8; --line:#2A2F33;
+    --trace:#4FB89E; --trace-soft:#1C2B27; --card:#1B1F23; --code-bg:#20252A;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.65}
+a{color:var(--trace)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--trace);outline-offset:2px;border-radius:2px}
+
+.layout{display:grid;grid-template-columns:264px minmax(0,1fr);min-height:100vh}
+.sidebar{border-right:1px solid var(--line);padding:28px 20px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{font-family:var(--disp);font-weight:700;font-size:19px;letter-spacing:-0.01em;margin:0}
+.brand-sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin:6px 0 0}
+.pins{height:7px;margin:16px 0 22px;background:repeating-linear-gradient(90deg,var(--trace) 0 6px,transparent 6px 13px);opacity:.55;border-radius:1px}
+.nav{list-style:none;margin:0;padding:0}
+.nav li{margin:0 0 2px}
+.nav a{display:flex;gap:10px;align-items:baseline;padding:8px 10px;border-radius:6px;text-decoration:none;color:var(--ink);font-size:14.5px;line-height:1.35}
+.nav a:hover{background:var(--trace-soft)}
+.nav a.active{background:var(--trace-soft);color:var(--trace);font-weight:500}
+.partno{font-family:var(--mono);font-size:10.5px;color:var(--muted);min-width:34px;letter-spacing:.03em}
+.nav a.active .partno{color:var(--trace)}
+.sidebar-foot{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.7}
+
+main{padding:44px 56px 80px;max-width:860px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--trace);border:1px solid var(--trace);display:inline-block;padding:2px 9px;border-radius:3px;margin-bottom:14px}
+article h1{font-family:var(--disp);font-weight:700;font-size:34px;letter-spacing:-0.02em;line-height:1.15;margin:0 0 8px}
+article h2{font-family:var(--disp);font-weight:500;font-size:22px;letter-spacing:-0.01em;margin:2.2em 0 .6em;padding-top:.6em;border-top:1px solid var(--line)}
+article h3{font-family:var(--disp);font-weight:500;font-size:17px;margin:1.6em 0 .4em}
+article p{margin:.9em 0}
+article em:first-of-type{color:var(--muted)}
+article strong{font-weight:500}
+article code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+article pre{background:var(--code-bg);padding:14px 16px;border-radius:8px;overflow-x:auto}
+article pre code{background:none;padding:0}
+article ul,article ol{padding-left:1.3em}
+article li{margin:.35em 0}
+article blockquote{margin:1em 0;padding:.2em 1.1em;border-left:3px solid var(--trace);color:var(--muted)}
+article table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:14.5px}
+article th{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-align:left;color:var(--muted);font-weight:500;border-bottom:1px solid var(--ink);padding:6px 12px 6px 0}
+article td{border-bottom:1px solid var(--line);padding:8px 12px 8px 0;vertical-align:top}
+article input[type=checkbox]{accent-color:var(--trace)}
+
+.pager{display:flex;justify-content:space-between;gap:16px;margin-top:56px;padding-top:20px;border-top:1px solid var(--line)}
+.pager a{text-decoration:none;font-size:14px;max-width:46%}
+.pager .dir{font-family:var(--mono);font-size:11px;color:var(--muted);display:block;margin-bottom:2px}
+.pager .next{margin-left:auto;text-align:right}
+
+.menu-btn{display:none}
+@media (max-width:820px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:fixed;z-index:10;background:var(--paper);width:264px;transform:translateX(-100%);transition:transform .2s}
+  .sidebar.open{transform:none;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}
+  @media (prefers-reduced-motion: reduce){.sidebar{transition:none}}
+  main{padding:20px 22px 60px}
+  .menu-btn{display:inline-block;font-family:var(--mono);font-size:13px;background:none;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:6px 12px;margin-bottom:18px;cursor:pointer}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters">
+    <h1 class="brand" id="site-title">AI silicon field notes</h1>
+    <p class="brand-sub" id="site-sub"></p>
+    <div class="pins" aria-hidden="true"></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="sidebar-foot">
+      source: notes/*.md<br>
+      add a chapter → edit manifest.json
+    </div>
+  </nav>
+  <main>
+    <button class="menu-btn" id="menu-btn" aria-label="Open chapter list">≡ chapters</button>
+    <div id="content" aria-live="polite"><article><p style="color:var(--muted)">Loading…</p></article></div>
+  </main>
+</div>
+<script src="vendor/marked.umd.js"></script>
+<script>
+let manifest = null;
+
+async function boot(){
+  try{
+    manifest = await (await fetch('manifest.json')).json();
+  }catch(e){
+    document.getElementById('content').innerHTML =
+      '<article><h1>Can\u2019t load manifest.json</h1><p>Serve this folder over HTTP \u2014 browsers block <code>fetch()</code> on <code>file://</code>. Run:</p><pre><code>python3 -m http.server 8080</code></pre><p>then open <a href="http://localhost:8080">http://localhost:8080</a>.</p></article>';
+    return;
+  }
+  document.getElementById('site-title').textContent = manifest.title;
+  document.getElementById('site-sub').textContent = manifest.subtitle || '';
+  document.title = manifest.title;
+  const nav = document.getElementById('nav');
+  nav.innerHTML = manifest.chapters.map(c =>
+    `<li><a href="#/${c.id}" data-id="${c.id}"><span class="partno">${c.part||''}</span><span>${c.title}</span></a></li>`
+  ).join('');
+  window.addEventListener('hashchange', route);
+  route();
+}
+
+function currentId(){
+  const h = location.hash.replace(/^#\//,'');
+  return manifest.chapters.some(c => c.id === h) ? h : manifest.chapters[0].id;
+}
+
+async function route(){
+  const id = currentId();
+  const idx = manifest.chapters.findIndex(c => c.id === id);
+  const ch = manifest.chapters[idx];
+  document.querySelectorAll('.nav a').forEach(a =>
+    a.classList.toggle('active', a.dataset.id === id));
+  document.getElementById('sidebar').classList.remove('open');
+
+  let md;
+  try{
+    const res = await fetch(`notes/${id}.md`);
+    if(!res.ok) throw new Error(res.status);
+    md = await res.text();
+  }catch(e){
+    document.getElementById('content').innerHTML =
+      `<article><h1>Missing note</h1><p><code>notes/${id}.md</code> is listed in the manifest but couldn\u2019t be loaded. Create the file, or remove its entry.</p></article>`;
+    return;
+  }
+
+  const html = marked.parse(md, {gfm:true});
+  const prev = manifest.chapters[idx-1], next = manifest.chapters[idx+1];
+  document.getElementById('content').innerHTML =
+    `<span class="eyebrow">${ch.part||'NOTE'}</span><article>${html}</article>
+     <nav class="pager" aria-label="Chapter navigation">
+       ${prev?`<a href="#/${prev.id}"><span class="dir">← previous</span>${prev.title}</a>`:'<span></span>'}
+       ${next?`<a class="next" href="#/${next.id}"><span class="dir">next →</span>${next.title}</a>`:''}
+     </nav>`;
+  window.scrollTo(0,0);
+}
+
+document.getElementById('menu-btn').addEventListener('click', () =>
+  document.getElementById('sidebar').classList.toggle('open'));
+boot();
+</script>
+</body>
+</html>
