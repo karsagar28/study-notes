@@ -36,6 +36,17 @@ The single most important relationship: **ECN must engage well before PFC.** Kma
 
 The blunt instrument. Detects a queue paused beyond a threshold (storm or deadlock), then stops honoring pause / drops on that queue — deliberately sacrificing losslessness to break the cycle, then restores after a recovery interval. Complementary mitigations: limit PFC to one or two classes, keep the lossless domain as small as possible, enforce valley-free routing so the lossless priority never rides a path that can re-ascend.
 
+## Aside: why RoCEv2 rides UDP, not TCP
+
+Everything TCP would provide, RoCEv2 already has — in NIC hardware. RoCEv2 = the InfiniBand transport layer wrapped in UDP/IP; that IB transport carries QPs, sequence numbers, ACK/NAK, and retransmission in silicon. TCP on top would mean a redundant state machine and two congestion controllers fighting over one flow. UDP is chosen because it adds *nothing* — the thinnest routable shim over IP.
+
+- **Byte streams break zero-copy.** RDMA's value is direct data placement — each packet self-describes where its payload lands (straight into app/GPU memory). TCP's ordered byte stream forces buffer→reassemble→copy, reintroducing exactly the overhead RDMA eliminates.
+- **Hardware implementability.** IB transport was designed for silicon. Full TCP state machines in NICs (TOE) are complex, per-connection stateful, and scale poorly to millions of QPs. The counterexample existed: **iWARP = RDMA over TCP**, and it lost largely for this reason.
+- **UDP contributes the one needed thing: ECMP entropy.** Dest port fixed (4791); *source* port varied per flow/QP — the entropy field switches hash on. The fabric load-balances RDMA without parsing IB headers. (Also the knob for multipath tricks: vary source port mid-flow → ECMP re-paths.)
+- **Congestion philosophy.** TCP's loss-based CC treats drops as the signal — the opposite of a lossless fabric. RoCEv2 delegates to DCQCN (above). TCP would also drag in handshakes and slow-start — poison for µs-scale barrier-synchronized bursts.
+
+Pattern to remember: UDP appears wherever a protocol has its own transport brain and just needs IP routability — VXLAN, QUIC, and UET all made the same call.
+
 ## SONiC side (CONFIG_DB)
 
 The knobs live in: `BUFFER_POOL` (shared pool + shared headroom pool), `BUFFER_PROFILE` (XOFF/XON/headroom, dynamic threshold **alpha**), `BUFFER_PG` (profile → port/PG binding), `WRED_PROFILE` (Kmin/Kmax/Pmax, ECN mode), `QUEUE` (WRED profile → egress queue), `PORT_QOS_MAP` (DSCP/PFC priority mapping), `PFC_WD` (watchdog detect/restore times, action).
