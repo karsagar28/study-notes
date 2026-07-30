@@ -56,6 +56,16 @@
       "id": "11-uec",
       "part": "X-11",
       "title": "UEC: Ultra Ethernet"
+    },
+    {
+      "id": "12-design-no-pfc",
+      "part": "X-12",
+      "title": "Design exercise: fabric without PFC/ECN"
+    },
+    {
+      "id": "13-refresher-glossary",
+      "part": "X-13",
+      "title": "Refresher glossary (interview prep)"
     }
   ]
 }

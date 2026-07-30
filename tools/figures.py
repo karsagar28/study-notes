@@ -270,6 +270,22 @@ def fig_three_answers():
     return svg(680, 168, "Three answers to the elephant-flow problem", b)
 
 
+def fig_no_pfc_tree():
+    b = box(190, 20, 300, 48, "gray", "No PFC / no ECN allowed", "two ways to change the physics")
+    b += box(100, 104, 240, 48, "teal", "Never congest", "admission by credits")
+    b += box(420, 104, 220, 48, "purple", "Tolerate loss", "recover per-packet")
+    b += arrow(280, 68, 222, 102) + arrow(400, 68, 528, 102)
+    kids = [(40, "teal", "InfiniBand", "credits + AR"),
+            (196, "teal", "Scheduled DDC", "cells + credits"),
+            (352, "teal", "TH Ultra / SUE", "credits + retry"),
+            (508, "purple", "UEC / UET", "spray + sel. rtx")]
+    for x, color, t, s in kids:
+        b += box(x, 200, 132, 56, color, t, s)
+    b += arrow(160, 152, 108, 198) + arrow(220, 152, 262, 198)
+    b += arrow(290, 152, 416, 198) + arrow(545, 152, 574, 198)
+    return svg(680, 276, "Building an AI fabric without PFC or ECN", b)
+
+
 FIGS = {
     "fig-nvidia-lineup.svg": fig_nvidia,
     "fig-silicon-one.svg": fig_silicon_one,
@@ -283,6 +299,7 @@ FIGS = {
     "fig-dcqcn-loop.svg": fig_dcqcn_loop,
     "fig-pfc-deadlock.svg": fig_pfc_deadlock,
     "fig-three-answers.svg": fig_three_answers,
+    "fig-no-pfc-tree.svg": fig_no_pfc_tree,
 }
 
 if __name__ == "__main__":

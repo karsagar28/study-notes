@@ -26,6 +26,8 @@ Silicon One = P4-programmable RTC engines → the program stretches, not the sil
 
 ## Quick glossary
 
+> For the exam/interview refresher (rails, JCT, parallelism, tuning order, etc.) see **X-13**.
+
 | Term | Meaning |
 |---|---|
 | VOQ | Virtual output queue — ingress queue per (egress port × traffic class); kills head-of-line blocking. See X-08. |
