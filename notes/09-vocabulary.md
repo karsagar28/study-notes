@@ -35,6 +35,7 @@ Silicon One = P4-programmable RTC engines → the program stretches, not the sil
 | ECN / PFC / DCQCN | Congestion signaling stack for RoCE: mark instead of drop, pause per priority, rate-control end hosts.See X-10. |
 | Incast | Many senders → one receiver simultaneously; the traffic pattern that defines buffer requirements. |
 | SUE | Broadcom Scale-Up Ethernet — Ethernet as an NVLink alternative inside the rack. |
+| UEC / UET | Ultra Ethernet Consortium / Transport — multivendor standard for AI Ethernet: native spray, selective retransmit. See X-11. |
 | HyperPort | Jericho4's bonded 3.2 Tbps logical port for scale-across links. |
 | CPO / LPO | Co-packaged / linear pluggable optics — moving or simplifying the optical conversion to cut power. |
 

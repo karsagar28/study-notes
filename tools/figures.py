@@ -256,6 +256,20 @@ def fig_pfc_deadlock():
     return svg(680, 304, "PFC pause-dependency deadlock and the watchdog", b)
 
 
+def fig_three_answers():
+    b = f'<text class="th" x="40" y="28">Three answers to ECMP elephant collisions</text>'
+    cols = [
+        (56, "teal", "DDC", "cells + credits", ["closed, single-vendor", "contention-free interior"]),
+        (252, "gray", "Spectrum-X", "switch + NIC pair", ["open wire, NVIDIA ends", "spray + NIC reorder"]),
+        (448, "purple", "UEC / UET", "standard endpoints", ["multivendor by design", "spray + selective rtx"]),
+    ]
+    for x, color, title, sub, lines in cols:
+        b += box(x, 44, 180, 56, color, title, sub)
+        for i, ln in enumerate(lines):
+            b += f'<text class="ts" x="{x+90}" y="{122 + i*18}" text-anchor="middle">{ln}</text>'
+    return svg(680, 168, "Three answers to the elephant-flow problem", b)
+
+
 FIGS = {
     "fig-nvidia-lineup.svg": fig_nvidia,
     "fig-silicon-one.svg": fig_silicon_one,
@@ -268,6 +282,7 @@ FIGS = {
     "fig-pfc-ecn-thresholds.svg": fig_pfc_ecn_thresholds,
     "fig-dcqcn-loop.svg": fig_dcqcn_loop,
     "fig-pfc-deadlock.svg": fig_pfc_deadlock,
+    "fig-three-answers.svg": fig_three_answers,
 }
 
 if __name__ == "__main__":

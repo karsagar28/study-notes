@@ -51,6 +51,11 @@
       "id": "10-pfc-ecn",
       "part": "X-10",
       "title": "Lossless Ethernet: PFC, ECN, watchdog"
+    },
+    {
+      "id": "11-uec",
+      "part": "X-11",
+      "title": "UEC: Ultra Ethernet"
     }
   ]
 }
