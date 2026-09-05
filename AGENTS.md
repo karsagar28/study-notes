@@ -1,5 +1,18 @@
 # Working agreement for this knowledge base
 
+## Repository routing
+
+This is `https://github.com/karsagar28/study-notes`, the destination for StepUp
+study-session notes. The separate `karsagar28.github.io` repository is for blog
+publishing. Capture study notes here; adapt them for the blog when requested.
+
+Before saving a session, read `README.md` and `manifest.json`, then inspect the
+relevant existing chapter. Extend that chapter when it fits; PFC/ECN are covered in
+`notes/10-pfc-ecn.md`; RDMA/RoCE transport belongs in the existing RDMA-depth
+chapter, `notes/14-interview-prep.md`. For a new chapter, follow
+`templates/topic-note.md` and add its entry to `manifest.json` so the reader can
+find it. A commit request means a local commit; push when requested.
+
 ## Purpose
 
 Use this repository as Karthik's working knowledge base for:

@@ -1,12 +1,23 @@
 # Lossless Ethernet: PFC, ECN, and the watchdog
 
-*Last updated: July 2026*
+*Status: scratch*
 
-RDMA (RoCEv2) assumes lossless transport — drops are catastrophic because go-back-N retransmission (on pre-adaptive-retransmit NICs) tanks throughput. So the fabric needs two mechanisms: one to **prevent drops** (PFC) and one to **prevent PFC from ever firing** (ECN). That framing is the whole tuning philosophy: **ECN is the first line of defense, PFC is the airbag.**
+*Last updated: September 2026*
+
+Reliable delivery and a lossless network are different. In Reliable Connected
+(RC) mode, RoCEv2's InfiniBand transport detects missing packets and retries in
+NIC hardware. A lossless fabric tries to avoid drops in the first place, because
+recovery can hurt throughput and latency. Suitable NICs and configuration also
+support lossy operation. Persistent failures eventually produce an error; not
+every RDMA transport mode provides reliable delivery.
+
+In a PFC-enabled design, ECN-based congestion control aims to slow senders before
+buffers fill, while PFC provides hop-by-hop protection against overflow. Neither
+replaces the endpoint transport's reliability mechanism.
 
 ## PFC (802.1Qbb)
 
-Per-priority pause. Unlike legacy 802.3x pause (stops the whole link), PFC pauses a single traffic class — typically priority 3 for RoCE data, 7 for CNPs. When a switch's ingress buffer for that priority crosses **XOFF**, it sends a pause frame upstream; traffic resumes at **XON**.
+Per-priority pause. Unlike legacy 802.3x pause (stops the whole link), PFC can pause selected priorities from 0–7. RoCE data is often assigned priority 3, but mappings are configuration choices. CNPs need prompt delivery; their queue treatment and PFC policy must be checked separately. When a switch's ingress buffer for that priority crosses **XOFF**, it sends a pause frame upstream; traffic resumes at **XON**.
 
 **Headroom**: after XOFF is sent, in-flight bytes keep arriving — pause-frame propagation, sender response time, one MTU serializing in each direction, plus 2× cable propagation delay. Headroom must absorb all of it. Rule of thumb: ~50 KB per port per lossless PG at 100G/100 m; longer links and 400G need meaningfully more. **Undersized headroom = drops on a "lossless" class — the worst failure mode because it's silent.** Buffer profiles are a strong candidate for generated config driven from a cable-length source of truth.
 
@@ -36,20 +47,64 @@ The single most important relationship: **ECN must engage well before PFC.** Kma
 
 The blunt instrument. Detects a queue paused beyond a threshold (storm or deadlock), then stops honoring pause / drops on that queue — deliberately sacrificing losslessness to break the cycle, then restores after a recovery interval. Complementary mitigations: limit PFC to one or two classes, keep the lossless domain as small as possible, enforce valley-free routing so the lossless priority never rides a path that can re-ascend.
 
-## Aside: why RoCEv2 rides UDP, not TCP
+## Related RDMA transport notes
 
-Everything TCP would provide, RoCEv2 already has — in NIC hardware. RoCEv2 = the InfiniBand transport layer wrapped in UDP/IP; that IB transport carries QPs, sequence numbers, ACK/NAK, and retransmission in silicon. TCP on top would mean a redundant state machine and two congestion controllers fighting over one flow. UDP is chosen because it adds *nothing* — the thinnest routable shim over IP.
+See [RDMA depth](#/14-interview-prep) for why RoCEv2 uses UDP and how RC provides reliability.
 
-- **Byte streams break zero-copy.** RDMA's value is direct data placement — each packet self-describes where its payload lands (straight into app/GPU memory). TCP's ordered byte stream forces buffer→reassemble→copy, reintroducing exactly the overhead RDMA eliminates.
-- **Hardware implementability.** IB transport was designed for silicon. Full TCP state machines in NICs (TOE) are complex, per-connection stateful, and scale poorly to millions of QPs. The counterexample existed: **iWARP = RDMA over TCP**, and it lost largely for this reason.
-- **UDP contributes the one needed thing: ECMP entropy.** Dest port fixed (4791); *source* port varied per flow/QP — the entropy field switches hash on. The fabric load-balances RDMA without parsing IB headers. (Also the knob for multipath tricks: vary source port mid-flow → ECMP re-paths.)
-- **Congestion philosophy.** TCP's loss-based CC treats drops as the signal — the opposite of a lossless fabric. RoCEv2 delegates to DCQCN (above). TCP would also drag in handshakes and slow-start — poison for µs-scale barrier-synchronized bursts.
+## DSCP, PCP, PFC, and ECN
 
-Pattern to remember: UDP appears wherever a protocol has its own transport brain and just needs IP routability — VXLAN, QUIC, and UET all made the same call.
+**Confirmed:** PFC is Ethernet priority-based. DSCP can classify traffic into a
+PFC-enabled priority, but PFC does not directly pause a DSCP value.
+
+| Field or mechanism | Location / scope | Role |
+|---|---|---|
+| DSCP, 6 bits | IP header | Classifies traffic for QoS treatment |
+| PCP, 3 bits | Ethernet VLAN tag | Identifies a Layer 2 priority |
+| PFC | Ethernet MAC Control frame; hop-by-hop | Pauses selected priorities at the immediate upstream neighbor |
+| ECN, 2 bits | IP header | Indicates ECN capability and congestion |
+| CNP | Receiver-to-sender RoCEv2 feedback | Informs the sender of congestion so it can reduce its rate |
+
+DSCP and ECN occupy separate bits in the same IP header byte. Depending on the
+configuration, classification uses DSCP or PCP. A DSCP-selected queue may have
+both PFC protection and ECN marking enabled.
+
+### Worked example
+
+Assume **DSCP 26 maps to priority 3** with PFC and ECN configured for the relevant
+traffic class. This mapping is an example, not a protocol requirement.
+
+1. The switch classifies a packet using its DSCP value.
+2. As congestion builds, the switch marks eligible packets with ECN CE.
+3. The receiver sends CNP feedback; the original sender reduces its rate.
+4. If buffer pressure reaches the PFC threshold, the switch asks its immediate
+   upstream neighbor to pause priority 3.
+5. If a packet is lost, RC transport handles detection and retransmission.
+
+### Interview checks
+
+- **Why UDP for reliable RDMA?** RC reliability lives in the InfiniBand transport
+  above UDP and is handled by the NIC.
+- **Is PFC DSCP-based and ECN IP-based?** ECN is an IP field. PFC is Ethernet
+  priority-based; DSCP, also an IP field, can select the relevant priority.
+- **What is the difference between PFC and ECN feedback?** PFC pauses a neighbor
+  by priority; ECN plus receiver feedback makes the original sender slow down.
+
+**Memory aid:** DSCP classifies. PFC pauses. ECN signals congestion. RC recovers loss.
 
 ## SONiC side (CONFIG_DB)
 
 The knobs live in: `BUFFER_POOL` (shared pool + shared headroom pool), `BUFFER_PROFILE` (XOFF/XON/headroom, dynamic threshold **alpha**), `BUFFER_PG` (profile → port/PG binding), `WRED_PROFILE` (Kmin/Kmax/Pmax, ECN mode), `QUEUE` (WRED profile → egress queue), `PORT_QOS_MAP` (DSCP/PFC priority mapping), `PFC_WD` (watchdog detect/restore times, action).
+
+## Sources
+
+Session claims on RC reliability, UDP encapsulation, and classification were
+verified on **2026-09-05**. Older tuning details elsewhere in this chapter remain
+scratch material requiring platform-specific validation.
+
+- [NVIDIA RoCE documentation](https://docs.nvidia.com/networking-ethernet-software/cumulus-linux/Layer-1-and-Switch-Ports/Quality-of-Service/RDMA-over-Converged-Ethernet-RoCE/) — RC reliability, PFC, ECN/CNP, and QoS mapping.
+- [NVIDIA transport overview](https://developer.nvidia.com/blog/?p=68265) — RoCEv2 transport and iWARP comparison.
+- [Cisco DSCP overview](https://www.cisco.com/c/en/us/support/docs/quality-of-service-qos/qos-packet-marking/10103-dscpvalues.html) — DSCP and ECN fields.
+- [Cisco PFC configuration](https://www.cisco.com/c/en/us/td/docs/dcn/nx-os/nexus9000/101x/configuration/qos/cisco-nexus-9000-nx-os-quality-of-service-configuration-guide-101x/m-configuring-priority-flow-control.pdf) — traffic classification and PFC priorities.
 
 ## Open questions / to research
 
@@ -57,3 +112,6 @@ The knobs live in: `BUFFER_POOL` (shared pool + shared headroom pool), `BUFFER_P
 - [ ] PFC watchdog detect/restore timers — vendor defaults vs what storms actually look like
 - [ ] How AFD interacts with DCQCN when CloudScale fronts a RoCE fabric (cross-ref C-07)
 - [ ] UEC's answer: does spray + smarter retransmit remove the need for PFC entirely?
+
+- [ ] Verify NIC-specific loss-recovery behavior and lossy RoCE support.
+- [ ] Trace DSCP/PCP mappings through NIC, switch priority, buffer priority group, and egress queue on the target platform.
