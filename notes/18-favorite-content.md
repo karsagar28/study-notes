@@ -2,13 +2,12 @@
 
 *Status: living personal index*  
 *Created: August 2026*  
-*Last updated: August 17, 2026*
+*Last updated: September 5, 2026*
 
 ## Purpose
 
-This page collects videos, playlists, articles, papers, books, courses, podcasts,
-and other material that I personally want to keep. It is a curated collection,
-not a general bibliography.
+This is where I keep videos, playlists, articles, papers, books, courses, and podcasts
+that I expect to revisit. It is a personal shortlist, not a general bibliography.
 
 Each item should capture:
 
@@ -33,7 +32,7 @@ Each item should capture:
 - **Link:** [Open playlist](https://www.youtube.com/playlist?list=PLnQL3JwXMDv3HxQ5ex_d5XAvZ0IhpFjs-)
 - **Creator:** 
 - **Topics:** NVIDIA Networking
-- **Why I saved it:** Study guide for the nvidia AI Networking certification 
+- **Why I saved it:** Study guide for the NVIDIA AI Networking certification.
 
 ## Videos
 
@@ -45,9 +44,9 @@ Each item should capture:
 - **Topics:** shell fundamentals, terminals, navigation, command composition,
   automation, and practical developer tooling
 - **Companion material:** [Lecture notes and exercises](https://missing.csail.mit.edu/2026/course-shell/)
-- **Why it is useful:** A practical introduction to the command line as a programmable,
-  composable interface rather than a collection of commands to memorize.
-- **Why I saved it:** engaging prsentation - watch the whole series. 
+- **Why it is useful:** Treats the command line as a programmable, composable interface
+  rather than a bag of commands to memorize.
+- **Why I saved it:** Engaging presentation. Watch the whole series.
 - **Metadata verified:** August 17, 2026
 
 #### Topics covered
@@ -67,10 +66,10 @@ Each item should capture:
   power distribution, storage architecture, high-speed networking, deployment, and
   lifecycle operations
 - **Companion material:** [How to build a GPU cluster from scratch for your ML team](https://files.lambdalabs.com/How%20to%20build%20a%20GPU%20cluster%20from%20scratch%20for%20your%20ML%20team.pdf)
-- **Why it is useful:** Presents GPU infrastructure as a complete system-design problem,
-  connecting facility power and racks to compute, storage, networking, software, and
-  ongoing operations. 
-- **Why I saved it:** a good reference for "how to design a AI fabric/cluster" question. 
+- **Why it is useful:** Connects facility power and rack design to compute, storage,
+  networking, software, and ongoing operations.
+- **Why I saved it:** A good reference for the “How would you design an AI fabric or
+  cluster?” interview question.
 - **Metadata verified:** August 17, 2026
 
 #### Topics covered

@@ -1,15 +1,14 @@
 # Certification hands-on resources: NCP-AIN, NCP-AII, and NCP-AIO
 
 *Status: reviewed resource guide*  
-*Last updated: August 2026*  
+*Last updated: September 2026*
 *Last verified: August 2026*
 
 ## Purpose
 
-This note is a cost-conscious reference for obtaining practical experience with the
-technologies covered by NVIDIA's professional AI networking, infrastructure, and
-operations certifications. The objective is to build credible operational skill without
-buying a DGX system.
+This is a practical, cost-conscious route through NVIDIA's professional AI networking,
+infrastructure, and operations certifications. The goal is real operating experience
+without buying a DGX system.
 
 ## Certification names
 
@@ -30,9 +29,9 @@ NCP-AIN -> NCP-AII -> NCP-AIO
 network -> deploy and validate -> operate and troubleshoot
 ```
 
-For an Ethernet/NVIS solutions-architect path, NCP-AIN has the strongest immediate
-alignment. NCP-AII provides deployment and validation depth; NCP-AIO adds day-two
-operations and live troubleshooting.
+For an Ethernet/NVIS solutions-architect path, start with NCP-AIN. NCP-AII adds
+deployment and validation depth, while NCP-AIO covers day-two operations and live
+troubleshooting.
 
 ## Exam overview
 
@@ -43,8 +42,8 @@ operations and live troubleshooting.
 | NCP-AIO | 30 questions plus 3 hands-on labs, 120 minutes | $500 | Linux CLI on BCM, Slurm and Kubernetes clusters; workload and fault management |
 
 NVIDIA recommends two to three years of relevant data-center operational experience
-for each professional certification. The lab plan below is a supplement for building
-skills and closing access gaps; it is not a replacement for production experience.
+for each professional certification. These labs build skill and close access gaps, but
+they do not replace production experience.
 
 ## Blueprint summary
 
@@ -80,8 +79,8 @@ skills and closing access gaps; it is not a replacement for production experienc
 
 ## Recommended lab portfolio
 
-No single affordable service reproduces an NVIDIA AI factory. Use several focused
-environments and reuse each one across certifications.
+No affordable service reproduces a complete NVIDIA AI factory. A better approach is
+to combine a few focused environments and reuse them across certifications.
 
 | Environment | Approximate cost | NCP-AIN | NCP-AII | NCP-AIO |
 |---|---:|---|---|---|
@@ -94,9 +93,9 @@ environments and reuse each one across certifications.
 
 ## Lab 1: NVIDIA DSX Air
 
-DSX Air should be the primary NCP-AIN practice environment. The current individual
-free trial provides up to 60 concurrent vCPUs, 60 GiB of memory, 10,000 compute-hour
-credits, and a one-year duration. It requires an NGC organization and business email.
+Use DSX Air as the main NCP-AIN practice environment. The current individual free trial
+provides up to 60 concurrent vCPUs, 60 GiB of memory, 10,000 compute-hour credits, and
+one year of access. It requires an NGC organization and a business email.
 
 ### Build and break these topologies
 
@@ -118,9 +117,9 @@ Maintain two saved versions of every lab:
 
 ### Limitations
 
-DSX Air is excellent for NOS configuration, architecture, automation, telemetry, and
-failure diagnosis. It does not fully reproduce real Spectrum ASIC buffering, physical
-congestion, optics, BlueField hardware, or a production InfiniBand subnet.
+DSX Air covers NOS configuration, architecture, automation, telemetry, and failure
+diagnosis well. It cannot reproduce real Spectrum ASIC buffering, physical congestion,
+optics, BlueField hardware, or a production InfiniBand subnet.
 
 ## Lab 2: three-node Linux cluster
 
@@ -194,8 +193,8 @@ DHCP, images, and Layer-2 management behavior that public-cloud VPCs may restric
 
 ## Lab 4: temporary single-GPU VM
 
-Rent GPU capacity only after preparing the command list and expected results. A less
-expensive L4, A40, A6000, or similar GPU is sufficient for most host-operations work.
+Prepare the commands and expected results before starting the billing clock. A less
+expensive L4, A40, A6000, or similar GPU is enough for most host-operations work.
 Use an A100 or H100 only when practicing supported MIG workflows.
 
 ### Exercises
@@ -217,8 +216,8 @@ or MIG administration. Verify those capabilities before paying.
 
 ## Lab 5: multi-GPU and two-node validation bursts
 
-Prepare scripts offline, rent the systems for a short session, capture the results, and
-terminate the resources immediately.
+Prepare scripts offline. Rent the systems for a short session, capture the results, and
+terminate the resources as soon as the tests finish.
 
 ### Single multi-GPU node
 
@@ -281,8 +280,8 @@ NVIDIA's current AI Networking learning path lists:
 | NetQ Deployment and Installation | Free |
 | BlueField DPU Administration | $50 |
 
-The $1,500 Spectrum-X instructor-led workshop provides official hands-on access but is
-best reserved for employer reimbursement or a final hardware-specific gap.
+The $1,500 Spectrum-X instructor-led workshop provides official hands-on access. It
+makes more sense with employer reimbursement or when it closes a final hardware gap.
 
 ## Suggested preparation order
 

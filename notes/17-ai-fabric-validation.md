@@ -1,20 +1,24 @@
 # Validating and accepting a new AI fabric
 
+*Status: reviewed study note*
+
+*Last updated: September 2026*
+
 > **Interview scenario:** You have designed and built a GPU training and inference fabric. How do you prove that it meets the customer's technical and performance requirements?
 
 ![AI fabric validation workflow](notes/img/fig-ai-fabric-validation.svg)
 
-The short answer is: **validate from the requirement backward, in layers, under realistic load, and with explicit pass/fail criteria.** A link-up check proves basic connectivity; it does not prove application performance, congestion behavior, failure recovery, or repeatability.
+**Work backward from the requirement. Test in layers, under realistic load, with explicit pass/fail criteria.** Link-up proves connectivity and little else. It says nothing about application performance, congestion, recovery, or repeatability.
 
 ## Interview-ready answer (about 90 seconds)
 
-I start by converting the design requirements into a signed acceptance-test matrix. For every requirement—topology, bandwidth, latency, collective performance, training throughput, inference tail latency, resilience, and observability—I define the traffic pattern, measurement method, test scale, and numerical pass/fail threshold.
+I first turn the design requirements into a signed acceptance-test matrix. Each requirement, including topology, bandwidth, latency, collective performance, training throughput, inference tail latency, resilience, and observability, gets a traffic pattern, measurement method, test scale, and numerical pass/fail threshold.
 
-I then validate in layers. First I prove physical and topology integrity: correct cabling and rail mapping, negotiated speed, FEC, BER, optics, MTU, firmware, and absence of degraded links. Next I validate the control plane and hosts: routing and ECMP, QoS, RoCE settings, RDMA reachability, GPU-to-NIC/NUMA affinity, GPUDirect RDMA, and software consistency.
+Testing proceeds in layers. Physical and topology checks cover cabling, rail mapping, negotiated speed, FEC, BER, optics, MTU, firmware, and degraded links. Control-plane and host checks cover routing and ECMP, QoS, RoCE settings, RDMA reachability, GPU-to-NIC/NUMA affinity, GPUDirect RDMA, and software consistency.
 
-After that I test performance progressively: point-to-point RDMA latency and bandwidth, all-to-all and bisection bandwidth, then NCCL collectives at node, rack, rail, and full-job scale. The final performance proof is the customer's representative workload. For training I measure step time, tokens per second, collective bandwidth, and scaling efficiency. For inference I measure throughput plus p95/p99 time-to-first-token and inter-token latency under realistic concurrency and bursts.
+Performance tests start with point-to-point RDMA latency and bandwidth, move to all-to-all and bisection bandwidth, then finish with NCCL collectives at node, rack, rail, and full-job scale. The customer's representative workload is the final proof. For training, I measure step time, tokens per second, collective bandwidth, and scaling efficiency. For inference, I measure throughput plus p95/p99 time to first token and inter-token latency under realistic concurrency and bursts.
 
-Finally, I repeat those tests during congestion, component failures, and a burn-in period. I verify ECN/PFC behavior, drops and retransmits, path convergence, workload impact, alerting, and recovery. I accept the fabric only when results meet the thresholds, remain consistent across rails and node groups, and are reproducible. The deliverable includes raw evidence, configurations, a golden baseline, exceptions, dashboards, and operating runbooks.
+I repeat the tests under congestion, component failures, and burn-in. That exposes ECN/PFC behavior, drops and retransmits, path convergence, workload impact, alerting, and recovery. The fabric passes only when results meet the thresholds, remain consistent across rails and node groups, and can be reproduced. The handoff includes raw evidence, configurations, a golden baseline, exceptions, dashboards, and operating runbooks.
 
 ## The governing principle
 
@@ -22,11 +26,11 @@ Finally, I repeat those tests during congestion, component failures, and a burn-
 requirement → measurable KPI → test method → pass/fail threshold → evidence
 ```
 
-Avoid accepting on averages alone. AI jobs are synchronized, so one slow link, rail, NIC, or GPU host can become a cluster-wide straggler. Validate **uniformity and variance**, not only peak throughput.
+Averages can hide a bad rail, NIC, link, or GPU host. Because AI jobs synchronize, one straggler can slow the cluster. Check **uniformity and variance** alongside peak throughput.
 
 ## 1. Build the acceptance matrix before testing
 
-Capture the intended topology and the workloads it must carry:
+Write down the intended topology and traffic before running a test:
 
 - GPU/node count, link speeds, number of rails, path diversity, oversubscription, and expected bisection bandwidth
 - training parallelism: data, tensor, pipeline, expert, and sequence parallel traffic
@@ -34,7 +38,7 @@ Capture the intended topology and the workloads it must carry:
 - tenant concurrency, storage/checkpoint traffic, management traffic, and maintenance conditions
 - clean-fabric, congested, degraded, failed-component, and soak-test states
 
-Thresholds must come from the customer requirement, validated design baseline, vendor reference, or agreed engineering budget—not from an arbitrary universal percentage.
+Set thresholds from the customer requirement, a validated design baseline, a vendor reference, or an agreed engineering budget. There is no useful universal percentage.
 
 | Requirement | KPI | Test condition | Example acceptance form |
 |---|---|---|---|
@@ -57,7 +61,7 @@ Verify the installed fabric matches the low-level design:
 - switch, NIC, cable, transceiver, driver, and firmware compatibility
 - power, cooling, and temperature behavior under sustained load
 
-For InfiniBand, `ibdiagnet` can validate expected link speed/width and rail-optimized connectivity. For Ethernet, use LLDP/topology data, switch interface/FEC/BER counters, cable validation, and the platform's fabric-health tooling. A topology check should detect a correctly operating cable placed on the **wrong rail**, not merely a disconnected cable.
+For InfiniBand, `ibdiagnet` can validate expected link speed/width and rail-optimized connectivity. For Ethernet, use LLDP/topology data, switch interface/FEC/BER counters, cable validation, and the platform's fabric-health tooling. A topology check must catch a live cable on the **wrong rail** as well as a disconnected cable.
 
 ## 3. Control plane, QoS, and endpoint readiness
 
@@ -71,7 +75,7 @@ Validate the forwarding system and the GPU hosts together:
 - consistent NIC firmware, driver/OFED or DOCA, CUDA, container, and NCCL versions
 - Kubernetes Network Operator, SR-IOV, device plug-ins, and IP pools when used
 
-This stage prevents blaming the switches for a host placement, affinity, software-version, or container configuration defect.
+These checks separate switch faults from host placement, affinity, software-version, and container problems.
 
 ## 4. Synthetic network tests
 
@@ -108,7 +112,7 @@ NVIDIA's ClusterKit also exposes latency/bandwidth, effective and bisection band
 
 ### Where GDRCopy, HPL, and LLM tests fit
 
-These tests are complementary: each exercises a different part of the system and none replaces NCCL or network-level testing.
+Each test covers a different part of the system. None replaces NCCL or network-level testing.
 
 | Test | What it proves | What it does **not** prove | Best use in acceptance |
 |---|---|---|---|
@@ -122,7 +126,7 @@ These tests are complementary: each exercises a different part of the system and
 
 #### GDRCopy nuance
 
-GDRCopy should not be described simply as a generic “CPU-to-GPU bandwidth test.” It maps GPU memory into CPU user space using GPUDirect RDMA mechanisms, allowing the CPU to drive very low-overhead copies. Its included tests measure copy bandwidth, copy latency, API latency, and CPU/GPU ping-pong latency.
+GDRCopy is not a generic “CPU-to-GPU bandwidth test.” It maps GPU memory into CPU user space through GPUDirect RDMA mechanisms, so the CPU can drive low-overhead copies. Its tests measure copy bandwidth, copy latency, API latency, and CPU/GPU ping-pong latency.
 
 The path is naturally asymmetric: CPU writes into GPU memory can benefit from write combining, while CPU reads from GPU memory are typically much slower. Therefore:
 
@@ -136,7 +140,7 @@ GDRCopy validates an **endpoint data path**, not the scale-out network. GPUDirec
 
 #### HPL nuance
 
-HPL is valuable because it sustains compute, memory, power, cooling, and multi-node communication together. NVIDIA explicitly lists HPL as a math-intensive application with network communication in its SuperPOD health guidance. Run single-node first, then multiple node groups and the intended scale; compare achieved performance, runtime variance, thermals, corrected errors, and node/rail counters.
+HPL keeps compute, memory, power, cooling, and multi-node communication busy at the same time. NVIDIA lists it as a math-intensive application with network communication in its SuperPOD health guidance. Run one node first, then several node groups and the intended scale. Compare achieved performance, runtime variance, thermals, corrected errors, and node/rail counters.
 
 Do not use HPL as the sole network acceptance benchmark. A strong HPL result can hide collective, incast, all-to-all, or small-message weaknesses that affect AI workloads. Pair it with NCCL, bisection tests, congestion tests, and an LLM job.
 
@@ -179,7 +183,7 @@ Test steady load and bursts, not just maximum throughput. Measure:
 - queueing and admission behavior at increasing concurrency
 - distributed prefill/decode, KV-cache transfer, expert routing, and cache locality when applicable
 
-The distinction matters: training acceptance is usually dominated by collective bandwidth, scaling, and straggler behavior; inference acceptance is often dominated by tail latency and SLO stability under concurrency.
+Training acceptance usually turns on collective bandwidth, scaling, and stragglers. Inference acceptance usually turns on tail latency and whether the SLO holds under concurrency.
 
 ## 7. Congestion and multi-tenant validation
 
@@ -212,7 +216,7 @@ Measure detection time, convergence, packet/workload impact, retry behavior, che
 
 Repeat NCCL, system stress, and representative application tests for the customer-agreed burn-in period. Trend thermals, BER, FEC corrections, link flaps, queue counters, errors, throughput, latency, and variance. A one-time peak result is not a production baseline.
 
-The acceptance package should contain:
+Hand over enough evidence for someone else to repeat the work:
 
 - requirement-to-test traceability matrix and signed results
 - as-built topology, cabling/rail map, configurations, and firmware/software versions
