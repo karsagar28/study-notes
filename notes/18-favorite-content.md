@@ -24,6 +24,7 @@ Each item should capture:
 | Playlist | [YouTube playlist — title to verify](https://www.youtube.com/playlist?list=PLnQL3JwXMDv3HxQ5ex_d5XAvZ0IhpFjs-) | To verify | To classify | Saved; needs annotation |
 | Video | [Lecture 1: Course Overview + Introduction to the Shell](https://www.youtube.com/watch?v=MSgoeuMqUmU) | Missing Semester | shell, command line, developer tools, CS education | Saved |
 | Video | [Building a GPU cluster for AI](https://www.youtube.com/watch?v=rfu5FwncZ6s) | Lambda | GPU cluster architecture, racks, compute, storage, networking, power | Saved |
+| Video | [AI Infrastructure Explained (GPUs, vLLM, and LLM-D)](https://www.youtube.com/watch?v=hBzUokVYQkI) | KodeKloud | AI infrastructure, GPUs, vLLM, LLM-D | Saved |
 
 ## Playlists
 
@@ -86,6 +87,15 @@ The architectural method remains useful, but the component examples and performa
 assumptions date from 2020 and should not be treated as current platform guidance.
 Lambda notes that slide 46 incorrectly connects the storage server to the compute-fabric
 network; the corrected diagram is in the companion whitepaper.
+
+### AI Infrastructure Explained (GPUs, vLLM, and LLM-D)
+
+- **Link:** [Watch on YouTube](https://www.youtube.com/watch?v=hBzUokVYQkI)
+- **Creator:** KodeKloud
+- **Topics (from title):** AI infrastructure, GPUs, vLLM, and LLM-D
+- **Why I saved it:** Added to my favourites for future study.
+- **Added:** September 5, 2026
+- **Metadata verified:** September 5, 2026 (YouTube title and creator)
 
 ## Articles
 
