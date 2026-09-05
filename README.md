@@ -7,7 +7,7 @@ Markdown in, website out. No build step, no node_modules, no framework. `marked.
 ## Run it
 
 ```bash
-cd ai-silicon-notes
+cd study-notes
 python3 -m http.server 8080
 # open http://localhost:8080
 ```
@@ -33,7 +33,8 @@ The `part` field is the silkscreen-style label shown in the sidebar and page eye
 - Mark evolving material as `scratch`, `reviewed`, or `blog-ready`; do not make rough notes sound final.
 - An **Open questions / to research** section at the bottom collects loose threads (GFM task lists render as checkboxes).
 - GFM tables are used heavily for lineups and comparisons.
-- New diagrams and flowcharts should be created in Excalidraw. Keep editable `.excalidraw` sources in `diagrams/` and export SVG copies to `notes/img/` for the reader. Existing generated figures can continue to use `tools/figures.py`.
+- Create every diagram and flowchart in Excalidraw. Keep the editable `.excalidraw` source in `diagrams/`; published SVGs in `notes/img/` are exports from those sources.
+- Run `python3 tools/check_diagrams.py` before committing a diagram change.
 - Flowcharts, packet/control-path diagrams, decision trees, sequence diagrams, and comparison tables are preferred when they communicate the idea better than prose alone.
 - Use `templates/topic-note.md` to start a substantial topic.
 - See `AGENTS.md` for the complete study-session and content-development workflow.

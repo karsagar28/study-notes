@@ -71,6 +71,26 @@
       "id": "14-interview-prep",
       "part": "X-14",
       "title": "Interview prep: RDMA depth + question bank"
+    },
+    {
+      "id": "15-training-vs-inference-fabrics",
+      "part": "X-15",
+      "title": "Training vs inference fabrics"
+    },
+    {
+      "id": "16-certification-hands-on-resources",
+      "part": "R-16",
+      "title": "Certification hands-on resources"
+    },
+    {
+      "id": "17-ai-fabric-validation",
+      "part": "X-17",
+      "title": "Validating and accepting an AI fabric"
+    },
+    {
+      "id": "18-favorite-content",
+      "part": "F-18",
+      "title": "My favorite content"
     }
   ]
 }

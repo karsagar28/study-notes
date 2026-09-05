@@ -14,3 +14,5 @@ notes/img/rocev2-congestion-loop.svg
 When updating a diagram, commit the `.excalidraw` source and refreshed SVG export
 together.
 
+Do not author or update SVG diagrams directly. Always make the change in Excalidraw,
+save the editable source here, and then export the matching SVG.

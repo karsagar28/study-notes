@@ -45,6 +45,14 @@ Prefer one teaching idea per diagram. Use clear labels, a restrained color palet
 and a legend when colors or line styles carry meaning. Make diagrams readable in
 both light and dark contexts when practical.
 
+Do not create or edit a published SVG directly. Excalidraw is the source of truth;
+SVG files are exports only. A diagram change is incomplete unless both the editable
+`.excalidraw` file and its matching SVG export are present.
+
+Before completing a diagram or note change, run `python3 tools/check_diagrams.py`.
+Completion requires every published SVG to have a same-named editable source and every
+local image reference in the notes to resolve.
+
 ## Note quality bar
 
 Each substantial topic should cover the relevant parts of this outline:
@@ -62,4 +70,3 @@ Each substantial topic should cover the relevant parts of this outline:
 
 Do not invent NVIDIA product behavior or exam requirements. Verify time-sensitive
 claims against authoritative sources before treating them as facts.
-
